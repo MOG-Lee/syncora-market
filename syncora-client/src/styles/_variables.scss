@@ -1,0 +1,24 @@
+$brand-primary:   #1a73e8; 
+$brand-secondary: #673ab7; 
+$brand-success:   #0f9d58;
+$brand-danger:    #d93025;
+$brand-warning:   #f4b400;
+$brand-info:      #4285f4;
+$brand-light:     #f8f9fa; 
+$brand-dark:      #202124;
+
+$primary:       $brand-primary;
+$secondary:     $brand-secondary;
+$success:       $brand-success;
+$danger:        $brand-danger;
+$warning:       $brand-warning;
+$info:          $brand-info;
+$light:         $brand-light;
+$dark:          $brand-dark;
+
+// 3. Typography
+$font-family-base: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+
+$enable-shadows: true;
+$border-radius:  0.5rem;

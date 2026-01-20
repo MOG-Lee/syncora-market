@@ -1,0 +1,33 @@
+// Import Bootstrap tools (this doesn't produce CSS, just tools)
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+// Make the links in the sidebar hover nicely
+.text-decoration-none {
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--bs-primary) !important;
+    text-decoration: underline !important;
+  }
+}
+
+.offcanvas-width {
+  @include media-breakpoint-down(md) {
+    width: 230px;
+  }
+}
+
+ 
+
+.w-xs-100 {
+  @include media-breakpoint-down(xs) { 
+    width: 100%;
+  }
+ 
+  @include media-breakpoint-up(sm) {
+    width: auto;
+    margin-top: 0;
+  }
+}

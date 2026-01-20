@@ -1,0 +1,55 @@
+// Import Bootstrap tools (this doesn't produce CSS, just tools)
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+.offcanvas-width {
+    width: 280px;
+
+    @include media-breakpoint-down(md) {
+        width: 230px;
+    }
+}
+
+
+// 1. DESKTOP RULES (Using mixin)
+@include media-breakpoint-up(lg) {
+    .offcanvas-lg {
+        position: static !important;
+        z-index: auto !important;
+        transform: none !important;
+        visibility: visible !important;
+        background-color: transparent;
+        // Senior Tip: Don't force 100vh here, let Flexbox handle height
+        height: 100% !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1); // Subtle separator
+    }
+
+    // Hide mobile-only elements
+    .offcanvas-header,
+    .offcanvas-backdrop {
+        display: none !important;
+    }
+}
+
+// 2. MOBILE RULES
+// Custom transition for smooth slide-in
+.offcanvas-lg {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.75) !important; // Dimmed white
+
+    &:hover {
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+        color: #fff !important;
+        // Use your brand color variable here
+        background-color: var(--bs-primary) !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+}

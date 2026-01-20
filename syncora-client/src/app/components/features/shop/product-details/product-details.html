@@ -1,0 +1,105 @@
+<div class="container py-4">
+    @if(isLoading()){
+    <div class="row animate-pulse">
+        <div class="col-md-6">
+            <div class="bg-secondary rounded opacity-25" style="aspect-ratio: 1 / 1; max-height: 500px;"></div>
+        </div>
+
+        <div class="col-md-6 py-4">
+            <div class="bg-secondary opacity-25 w-75 mb-4 rounded" style="height: 30px;"></div>
+
+            <div class="bg-secondary opacity-25 w-25 mb-4 rounded" style="height: 24px;"></div>
+
+            <div class="bg-secondary opacity-25 w-100 mb-2 rounded" style="height: 16px;"></div>
+            <div class="bg-secondary opacity-25 w-100 mb-2 rounded" style="height: 16px;"></div>
+        </div>
+    </div>
+    } @else if(product(); as item){
+    <div class="row g-5">
+
+        <div class="col-md-6">
+            <div class="p-2 border rounded bg-white text-center position-relative overflow-hidden">
+                <img [src]="item.imageUrl | productImg:'l'" [alt]="item.name"
+                    class="img-fluid main-image object-fit-contain">
+                @if(item.isOnFlashSale){
+                <span class="position-absolute top-0 start-0 m-3 badge bg-danger fs-6 px-3 py-2 shadow-sm">
+                    <i class="bi bi-lightning-fill"></i> Flash Deal
+                </span>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-2 text-primary fw-bold small text-uppercase tracking-wide">
+                sold by {{item.vendorName}}
+            </div>
+
+            <h1 class="fw-bold mb-2">{{item.name}}</h1>
+
+            <div class="d-flex align-items-center mb-4">
+                <div class="text-warning me-2">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                </div>
+                <span class="text-muted small">({{ item.averageRating }} ratings)</span>
+            </div>
+
+            <div class="mb-4 p-3 bg-light rounded border">
+                <div class="d-flex align-items-end gap-2">
+                    <span class="display-5 fw-bold text-dark">{{ item.price | currency }}</span>
+                    @if (item.isOnFlashSale) {
+                    <span class="text-muted text-decoration-line-through fs-5 mb-2">
+                        {{ item.price * 1.2 | currency}}
+                    </span>
+                    }
+                </div>
+                <p class="text-success small mb-0 mt-1">
+                    <i class="bi bi-check-circle-fill me-1"></i> Includes VAT & Free Shipping
+                </p>
+            </div>
+
+            <p class="text-muted mb-4 lh-lg">
+                {{ item.description }}
+            </p>
+
+            @if (item.stockQuantity > 0) {
+            <div class="text-success fw-bold mb-4">
+                <i class="bi bi-box-seam me-1"></i> In Stock ({{ item.stockQuantity }} available)
+            </div>
+            } @else {
+            <div class="text-danger fw-bold mb-4">
+                <i class="bi bi-x-circle me-1"></i> Out of Stock
+            </div>
+            }
+
+            <div class="d-flex gap-3">
+                <button class="btn btn-primary btn-lg flex-grow-1 shadow-sm" (click)="addToCart()"
+                    [disabled]="item.stockQuantity === 0"> Add to Cart
+                </button>
+                <button class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+
+            <div class="row mt-5 text-center text-muted small">
+                <div class="col-4">
+                    <i class="bi bi-shield-check fs-4 d-block mb-1"></i>
+                    Secure<br>Payment
+                </div>
+                <div class="col-4">
+                    <i class="bi bi-truck fs-4 d-block mb-1"></i>
+                    Fast<br>Delivery
+                </div>
+                <div class="col-4">
+                    <i class="bi bi-arrow-counterclockwise fs-4 d-block mb-1"></i>
+                    30 Days<br>Return
+                </div>
+            </div>
+
+        </div>
+    </div>
+    }
+</div>

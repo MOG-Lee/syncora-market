@@ -1,0 +1,52 @@
+// Hover Effect: Lifts the card slightly
+.product-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Image Container: Fixed height to prevent jagged grid rows
+.image-container {
+  height: 220px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+// Vendor Text
+.vendor-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+// Truncation: Forces title to exactly 2 lines with "..."
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.4em; // height = line-height * 2 lines
+  line-height: 1.2em;
+}
+
+// Original Price Style
+.original-price {
+  font-size: 0.8rem;
+  margin-top: -2px;
+}
+
+// Add Button: Circular style
+.btn-add {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}

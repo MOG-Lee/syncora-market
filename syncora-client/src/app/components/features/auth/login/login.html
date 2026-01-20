@@ -1,0 +1,70 @@
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100 py-4 bg-white">
+    <a routerLink="/" class="text-decoration-none mb-3">
+        <h2 class="fw-bold text-dark">Syncora</h2>
+    </a>
+
+    <div class="card shadow-sm border rounded-3 p-4" style="width: 100%; max-width: 350px;">
+        <h3 class="fw-normal mb-3">Sign in</h3>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+            @if (errorMessage()) {
+            <div class="alert alert-danger border-danger p-2 mb-3 small shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+                <strong>There was a problem</strong>
+
+                <div class="mt-1">
+                    {{ errorMessage() }}
+                </div>
+            </div>
+            }
+
+            <div class="mb-3">
+                <label for="email" class="form-label fw-bold small">Email or mobile phone number</label>
+                <input type="email" formControlName="email" id="email" class="form-control form-control-sm"
+                    [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+
+                @if(loginForm.get('email')?.hasError('required')){
+                <div class="invalid-feedback">Email is required.</div>
+                }
+                @if (loginForm.get('email')?.hasError('email')) {
+                <div class="invalid-feedback">Please enter a valid email.</div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <label for="password" class="form-label fw-bold small"> Password</label>
+                    <a href="#" class="text-decoration-none small"> Forgot your password?</a>
+                </div>
+                <input type="password" id="password" formControlName="password" class="form-control form-control-sm">
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 shadow-sm mb-3 btn-sm fw-bold"
+                [disabled]="loginForm.invalid || isLoading()">
+                @if (isLoading()) {
+                <span class="spinner-border spinner-border-sm me-1"></span> Signing in...
+                }
+                @else {
+                Sign in
+                }
+            </button>
+
+            <p class="text-muted mb-0" style="font-size: 11px; line-height: 1.4;">
+                By continuing, you agree to Syncora's <a href="#">Conditions of Use</a> and <a href="#">Privacy
+                    Notice</a>.
+            </p>
+        </form>
+    </div>
+
+    <div class="text-center mt-3 w-100" style="max-width: 350px;">
+        <div class="position-relative border-top my-3">
+            <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted small">New to
+                Syncora?</span>
+        </div>
+
+        <a routerLink="/register" class="btn btn-light border w-100 shadow-sm btn-sm mt-1"> Create your Syncora account
+        </a>
+    </div>
+
+</div>

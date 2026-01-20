@@ -1,0 +1,21 @@
+@import 'styles/variables';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--bs-gray-100);
+  font-family: var(--bs-body-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  // background-color: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}

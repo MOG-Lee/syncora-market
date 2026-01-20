@@ -1,0 +1,61 @@
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100 py-4 bg-white">
+
+    <a routerLink="/" class="text-decoration-none mb-3">
+        <h2 class="fw-bold text-dark tracking-tight">Syncora</h2>
+    </a>
+
+    <div class="card shadow-sm border rounded-3 p-4" style="width: 100%; max-width: 350px;">
+        <h3 class="fw-normal mb-3">Create account</h3>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Your name</label>
+                <input type="text" class="form-control form-control-sm" formControlName="name"
+                    placeholder="First and last name">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Email</label>
+                <input type="email" class="form-control form-control-sm" formControlName="email">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Password</label>
+                <input type="password" class="form-control form-control-sm" formControlName="password"
+                    placeholder="At least 6 characters">
+                <div class="form-text" style="font-size: 11px;">
+                    <i class="bi bi-info-circle"></i> Passwords must be at least 6 characters.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Re-enter password</label>
+                <input type="password" class="form-control form-control-sm" formControlName="confirmPassword"
+                    [class.is-invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+
+                @if (registerForm.hasError('mismatch')) {
+                <div class="invalid-feedback">Passwords must match</div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 shadow-sm mb-3 btn-sm fw-bold"
+                [disabled]="registerForm.invalid || isLoading()">
+                @if (isLoading()) {
+                Creating...
+                } @else {
+                Create your Syncora account
+                }
+            </button>
+
+            <div class="pt-3 border-top">
+                <p class="small mb-0">
+                    Already have an account?
+                    <a routerLink="/login" class="text-decoration-none">Sign in <i class="bi bi-chevron-right"
+                            style="font-size: 10px;"></i></a>
+                </p>
+            </div>
+
+        </form>
+    </div>
+</div>

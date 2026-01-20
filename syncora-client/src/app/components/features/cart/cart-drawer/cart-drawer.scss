@@ -1,0 +1,7 @@
+// Ensure the drawer sits on top of everything
+.offcanvas {
+  z-index: 1055; // Bootstrap default for offcanvas is 1045, modal is 1055
+}
+.offcanvas-backdrop {
+  z-index: 1050;
+}

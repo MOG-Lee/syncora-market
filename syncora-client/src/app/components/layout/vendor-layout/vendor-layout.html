@@ -1,0 +1,78 @@
+<div class="d-flex vh-100 overflow-hidden">
+
+    <aside class="offcanvas-lg offcanvas-start offcanvas-width bg-dark text-white d-flex flex-column flex-shrink-0"
+        [class.show]="showMobileSidebar()" tabindex="-1" id="sidebarMenu">
+
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title">Syncora Vendor</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeMobileSidebar()"></button>
+        </div>
+
+        <div class="offcanvas-body d-flex flex-column p-0 h-100">
+            <div class="p-3">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a routerLink="/vendor/dashboard" routerLinkActive="active" class="nav-link text-white"
+                            (click)="closeMobileSidebar()">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a routerLink="/vendor/orders" routerLinkActive="active" class="nav-link text-white"
+                            (click)="closeMobileSidebar()">
+                            <i class="bi bi-box-seam me-2"></i> Orders
+                        </a>
+                    </li>
+                    <li>
+                        <a routerLink="/vendor/products" routerLinkActive="active" class="nav-link text-white"
+                            (click)="closeMobileSidebar()">
+                            <i class="bi bi-grid me-2"></i> Products
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mt-auto p-3 border-top border-secondary">
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="bg-secondary rounded-circle d-flex justify-content-center align-items-center"
+                        style="width: 32px; height: 32px;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <span class="ms-2">Vendor Name</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="d-flex flex-column flex-grow-1 overflow-auto bg-light">
+
+        <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top px-4 py-3">
+            <div class="d-flex align-items-center w-100">
+
+                <button class="btn btn-outline-secondary d-lg-none me-3" type="button" (click)="toggleMobileSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <h5 class="mb-0">Dashboard</h5>
+
+                <div class="ms-auto d-flex gap-3">
+                    <button class="btn btn-light rounded-circle position-relative">
+                        <i class="bi bi-bell"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4">
+            <router-outlet></router-outlet>
+        </main>
+
+    </div>
+
+    @if (showMobileSidebar()) {
+    <div class="offcanvas-backdrop fade show d-lg-none" (click)="closeMobileSidebar()"></div>
+    }
+
+</div>

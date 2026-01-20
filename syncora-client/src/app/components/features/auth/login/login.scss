@@ -1,0 +1,43 @@
+.auth-container {
+  background-color: #fff; // Pure white background
+}
+
+.card {
+  border-color: #ddd; // Subtle border
+}
+
+// Amazon uses very slight rounding on inputs
+.form-control {
+  border-radius: 3px; 
+  box-shadow: none; // Remove standard Bootstrap glow
+  border: 1px solid #a6a6a6;
+
+  &:focus {
+    border-color: #e77600; // Orange focus ring
+    box-shadow: 0 0 3px 2px rgba(228, 121, 17, 0.5);
+  }
+}
+
+// The "Yellow" Button
+.btn-warning {
+  background: #ffd814;
+  border-color: #fcd200;
+  border-radius: 8px;
+
+  &:hover {
+    background: #f7ca00;
+    border-color: #f2c200;
+  }
+}
+
+// The "Create Account" Button (Gray)
+.btn-light {
+  background: #fff;
+  border-color: #d5d9d9;
+  border-radius: 8px;
+
+  &:hover {
+    background: #f7faf7;
+    border-color: #d5d9d9;
+  }
+}
