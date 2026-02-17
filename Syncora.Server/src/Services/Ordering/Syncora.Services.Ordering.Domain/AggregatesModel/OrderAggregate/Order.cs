@@ -20,6 +20,7 @@ namespace Syncora.Services.Ordering.Domain.AggregatesModel.OrderAggregate
         public decimal Total { get; private set; }
         public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
+        // for EF Core
         protected Order()
         {
             _orderItems = new List<OrderItem>();

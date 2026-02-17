@@ -13,6 +13,8 @@ namespace Syncora.Services.Ordering.Infrastructure.Persistence.EntityConfigurati
     {
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
+            builder.ToTable("OrderItems");
+
             builder.HasKey(ci => ci.Id);
             builder.Property(ci => ci.Id).ValueGeneratedNever();
 

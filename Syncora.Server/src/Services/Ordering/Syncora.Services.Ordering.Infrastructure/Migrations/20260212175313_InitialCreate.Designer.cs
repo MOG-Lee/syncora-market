@@ -12,15 +12,15 @@ using Syncora.Services.Ordering.Infrastructure.Persistence;
 namespace Syncora.Services.Ordering.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
-    [Migration("20260209213133_InitialDatabase")]
-    partial class InitialDatabase
+    [Migration("20260212175313_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.12")
+                .HasAnnotation("ProductVersion", "8.0.24")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -78,7 +78,7 @@ namespace Syncora.Services.Ordering.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Syncora.Services.Ordering.Domain.AggregatesModel.OrderAggregate.Order", b =>

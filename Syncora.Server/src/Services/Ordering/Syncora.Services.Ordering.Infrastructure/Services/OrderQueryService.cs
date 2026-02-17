@@ -20,13 +20,13 @@ namespace Syncora.Services.Ordering.Infrastructure.Services
         public OrderQueryService(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("OrderingDb")
-             ?? throw new DomainException("Connection string 'OrderingDb' not found.");
+             ?? throw new ArgumentNullException("Connection string 'OrderingDb' not found.");
         }
 
         public async Task<OrderDetailDto> GetOrderAsync(Guid id)
         {
             using var connection = new SqlConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             var sqlOrder = @"
             SELECT o.Id as OrderId, o.OrderDate as Date, o.OrderStatus as Status, o.Total,
@@ -41,7 +41,7 @@ namespace Syncora.Services.Ordering.Infrastructure.Services
 
             var sqlItems = @"
                 SELECT ProductName, PictureUrl, Units, UnitPrice
-                FROM OrderItem
+                FROM OrderItems
                 WHERE OrderId = @id"; 
 
             var items = await connection.QueryAsync<OrderViewItemDto>(sqlItems, new { id });
@@ -55,7 +55,7 @@ namespace Syncora.Services.Ordering.Infrastructure.Services
         public async Task<IEnumerable<OrderSummaryDto>> GetOrdersFromUserAsync(Guid userId)
         {
             using var connection = new SqlConnection(_connectionString);
-            connection.Open(); 
+            await connection.OpenAsync();
 
             var sql = @"
             SELECT Id as OrderId, OrderDate as Date, OrderStatus as Status, Total

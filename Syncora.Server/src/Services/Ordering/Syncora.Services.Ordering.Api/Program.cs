@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Syncora.Services.Ordering.Api.Extensions;
 using Syncora.Services.Ordering.Api.Infrastructure;
@@ -18,12 +19,38 @@ builder.Services.AddDbContext<OrderingDbContext>(options =>
         // retry if DB goes offline especially in Azure
         sqlOptions =>
         {
-            // Resiliency (Polly) - retry up to 5 times - each time never waits more than 30 seconds (ex: try1 : 1s - try2: 3s - try3: 8s ...)
-            sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+            // Resiliency (Polly) - retry up to 5 times - each time never waits more than 10 seconds (ex: try1 : 1s - try2: 3s - try3: 8s ...)
+            sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
             // Look for migration files in the Infrastructure
             sqlOptions.MigrationsAssembly(typeof(OrderingDbContext).Assembly.FullName);
         });
 });
+
+// add massTransit 
+builder.Services.AddMassTransit(x =>
+{
+    //Setup the Outbox
+    x.AddEntityFrameworkOutbox<OrderingDbContext>(o =>
+    {
+        o.QueryDelay = TimeSpan.FromSeconds(5); // How often to check for new messages
+        o.UseSqlServer();
+        o.UseBusOutbox(); // make IBus/IPublishEndpoint write to DB, not RabbitMQ
+    });
+
+    //Setup RabbitMQ
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        // Automatically create queues for registered consumers
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();

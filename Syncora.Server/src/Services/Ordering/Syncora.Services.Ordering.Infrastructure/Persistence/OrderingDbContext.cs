@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Syncora.Services.Ordering.Domain.AggregatesModel.OrderAggregate;
@@ -32,27 +33,26 @@ namespace Syncora.Services.Ordering.Infrastructure.Persistence
 
         public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
         {
-            // 1. CRITICAL: Actually dispatch the events before saving!
-            // This Extension Method (we need to create it) moves events from Entities -> MediatR
-            //await _mediator.DispatchDomainEventsAsync(this);
+            // This runs the "Bridge Handler" -> Publishes to Outbox -> Adds to ChangeTracker
+            await _mediator.DispatchDomainEventsAsync(this);
 
-            // 2. Commit the transaction (Saves Order + Outbox Messages)
+            // Commit EVERYTHING (Order + Outbox Messages) in one SQL Transaction
             await base.SaveChangesAsync(cancellationToken);
             return true;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Ignore<DomainEvent>(); 
+            modelBuilder.Ignore<DomainEvent>();
 
             // Scan files implementing IEntityTypeConfiguration
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            // 3. CRITICAL: Add MassTransit Outbox Tables
-            // Without this, MassTransit can't save the messages to the DB
-            //modelBuilder.AddInboxStateEntity();
-            //modelBuilder.AddOutboxMessageEntity();
-            //modelBuilder.AddOutboxStateEntity();
+            //Enable MassTransit Outbox Tables
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
+
 
             base.OnModelCreating(modelBuilder);
         }
