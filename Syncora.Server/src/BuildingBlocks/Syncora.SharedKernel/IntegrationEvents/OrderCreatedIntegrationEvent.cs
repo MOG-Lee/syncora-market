@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Syncora.SharedKernel.IntegrationEvents
 {
     public record OrderCreatedIntegrationEvent(Guid OrderId, Guid BuyerId, decimal TotalPrice,
-        List<OrderItemDto> items);
+        List<OrderItemDto> Items);
 
     public record OrderItemDto(Guid ProductId, int Units);
 }

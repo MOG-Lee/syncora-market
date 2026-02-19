@@ -87,6 +87,28 @@ namespace Syncora.Services.Ordering.Domain.AggregatesModel.OrderAggregate
             AddDomainEvent(new OrderCancelledDomainEvent(this));
         }
 
+        // prevent infinite events calling
+        public void SetStockRejected(string reason)
+        {
+            if (OrderStatus == OrderStatus.Cancelled) 
+                return;
+
+            OrderStatus = OrderStatus.Cancelled;
+            // we can also fire OrderFailedEvent for notification (email) to the user
+        }
+
+        public void SetStockConfirmed()
+        {
+            if (OrderStatus == OrderStatus.StockConfirmed) 
+                return;
+
+            if (OrderStatus == OrderStatus.Cancelled)
+                throw new DomainException("Cannot confirm stock for a cancelled order.");
+
+            OrderStatus = OrderStatus.StockConfirmed;
+        }
+
+
         private void CalculateTotal()
         {
             Total = _orderItems.Sum(oi => oi.UnitPrice * oi.Units);

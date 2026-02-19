@@ -23,10 +23,10 @@ namespace Syncora.Services.Inventory.Application.Consumers
 
         public async Task Consume(ConsumeContext<OrderCancelledIntegrationEvent> context)
         {
+            _logger.LogInformation("Restocking items for Cancelled Order {OrderId}", context.Message.OrderId);
+
             try
             {
-                _logger.LogInformation("Restocking items for Cancelled Order {OrderId}", context.Message.OrderId);
-
                 foreach (var item in context.Message.items)
                 {
                     var inventoryItem = await _repository.GetByProductIdAsync(item.ProductId);
@@ -35,13 +35,26 @@ namespace Syncora.Services.Inventory.Application.Consumers
                     {
                         inventoryItem.AddStock(item.Units);
                     }
+                    else
+                    {
+                        // Just log warning, don't crash.
+                        _logger.LogWarning("Product {ProductId} not found during restock for Order {OrderId}", item.ProductId, context.Message.OrderId);
+                    }
                 }
+
+                // 2. Publish Confirmation (Saga Step) and save in outbox table
+                await context.Publish(new OrderRestockedIntegrationEvent(context.Message.OrderId));
+
                 await _repository.UnitOfWork.SaveEntitiesAsync(context.CancellationToken);
+
+                _logger.LogInformation("Order {OrderId} successfully restocked.", context.Message.OrderId);
             }
             catch (Exception ex)
             {
-                //system crash. re-throw so MassTransit knows to Retry 
-                _logger.LogError(ex, "System failure while saving inventory for Order {OrderId}", context.Message.OrderId);
+                // system failures like Database is down, Network blip
+                _logger.LogError(ex, "System failure during restock for Order {OrderId}", context.Message.OrderId);
+
+                // re-throw so MassTransit keeps the message in RabbitMQ 
                 throw;
             }
         }

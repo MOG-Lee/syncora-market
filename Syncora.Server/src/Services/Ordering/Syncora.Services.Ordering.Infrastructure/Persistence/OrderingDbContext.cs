@@ -49,7 +49,7 @@ namespace Syncora.Services.Ordering.Infrastructure.Persistence
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             //Enable MassTransit Outbox Tables
-            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddInboxStateEntity(); //This handles Idempotency
             modelBuilder.AddOutboxMessageEntity();
             modelBuilder.AddOutboxStateEntity();
 

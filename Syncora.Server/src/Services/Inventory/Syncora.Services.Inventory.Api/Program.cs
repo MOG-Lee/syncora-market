@@ -1,5 +1,6 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Syncora.Services.Inventory.Api.Extensions;
 using Syncora.Services.Inventory.Api.Infrastructure;
 using Syncora.Services.Inventory.Application.Consumers;
@@ -9,69 +10,102 @@ using Syncora.Services.Inventory.Infrastructure.Persistence;
 using Syncora.Services.Inventory.Infrastructure.Repositories;
 using Syncora.Services.Inventory.Infrastructure.Services;
 
-var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<InventoryDbContext>(options =>
+//Setup Serilog before the builder
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+try
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("InventoryDb"),
-        sqlOptions =>
-        {
-            sqlOptions.MigrationsAssembly(typeof(InventoryDbContext).Assembly.FullName);
-            sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-        });
-});
+    Log.Information("Starting Inventory API...");
 
-builder.Services.AddMassTransit(x =>
-{
-    // Register the Consumer
-    x.AddConsumer<OrderCreatedConsumer>();
-    x.AddConsumer<OrderCancelledConsumer>();
+    var builder = WebApplication.CreateBuilder(args);
 
-    x.UsingRabbitMq((context, cfg) =>
+    //Full serilog Setup: Read config from appsettings.json
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
+
+    builder.Services.AddDbContext<InventoryDbContext>(options =>
     {
-        cfg.Host("localhost", "/", h =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("InventoryDb"),
+            sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly(typeof(InventoryDbContext).Assembly.FullName);
+                sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            });
+    });
+
+    builder.Services.AddMassTransit(x =>
+    {
+        // Register the Consumer
+        x.AddConsumer<OrderCreatedConsumer>();
+        x.AddConsumer<OrderCancelledConsumer>();
+
+        x.AddEntityFrameworkOutbox<InventoryDbContext>(o =>
         {
-            h.Username("guest");
-            h.Password("guest");
+            o.QueryDelay = TimeSpan.FromSeconds(10);
+            o.UseSqlServer();
+            o.UseBusOutbox();
         });
 
-        // Automatically create queues for registered consumers
-        cfg.ConfigureEndpoints(context);
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            cfg.Host("localhost", "/", h =>
+            {
+                h.Username("guest");
+                h.Password("guest");
+            });
+
+            // Automatically create queues for registered consumers
+            cfg.ConfigureEndpoints(context);
+        });
     });
-});
 
 
-builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
-builder.Services.AddScoped<IInventoryQueryService, InventoryQueryService>();
+    builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+    builder.Services.AddScoped<IInventoryQueryService, InventoryQueryService>();
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Syncora.Services.Inventory.Application.InventoryItems.Commands.CreateInventoryItem.CreateInventoryItemCommand).Assembly));
+    builder.Services.AddMediatR(cfg =>
+        cfg.RegisterServicesFromAssembly(typeof(Syncora.Services.Inventory.Application.InventoryItems.Commands.CreateInventoryItem.CreateInventoryItemCommand).Assembly));
 
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    builder.Services.AddProblemDetails();
 
-var app = builder.Build();
+    var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
-    await app.ApplyDatabaseMigrationAsync();
+        await app.ApplyDatabaseMigrationAsync();
+    }
+
+    app.UseExceptionHandler();
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+
 }
-
-app.UseExceptionHandler();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

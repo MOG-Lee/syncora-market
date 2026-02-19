@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using Syncora.Services.Inventory.Domain.AggregatesModel.InventoryAggregate;
+using Syncora.SharedKernel.Exceptions;
 using Syncora.SharedKernel.IntegrationEvents;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Syncora.Services.Inventory.Application.Consumers
     {
         private readonly IInventoryRepository _repository;
         private readonly ILogger<OrderCreatedConsumer> _logger;
+
         public OrderCreatedConsumer(IInventoryRepository inventoryRepository, ILogger<OrderCreatedConsumer> logger)
         {
             _repository = inventoryRepository;
@@ -22,53 +24,62 @@ namespace Syncora.Services.Inventory.Application.Consumers
 
         public async Task Consume(ConsumeContext<OrderCreatedIntegrationEvent> context)
         {
+            _logger.LogInformation("Checking stock for order {OrderId}", context.Message.OrderId);
+
             try
             {
-                _logger.LogInformation("Checking stock for order {OrderId}", context.Message.OrderId);
-
-                foreach (var item in context.Message.items)
+                foreach (var item in context.Message.Items)
                 {
                     var inventoryItem = await _repository.GetByProductIdAsync(item.ProductId);
 
                     if (inventoryItem == null)
                     {
-                        // TODO: Publish StockRejectedEvent (Product doesn't exist)
-                        _logger.LogWarning("Product {ProductId} not found in inventory!", item.ProductId);
-                        // For now, we return, but this leaves the Order in "Submitted" state forever.
-                        // We will fix this when we implement Saga Compensation.
-                        //** sth like await context.Publish(new StockRejectedEvent(context.Message.OrderId, "Product not found"));
+                        _logger.LogWarning("Order {OrderId} Rejected: Product {ProductId} not found.", context.Message.OrderId, item.ProductId);
+                        await RejectOrder(context, $"Product {item.ProductId} not found");
                         return;
                     }
-                    else
+
+                    if (inventoryItem.AvailableStock < item.Units)
                     {
-                        try
-                        {
-                            inventoryItem.RemoveStock(item.Units);
-                        }
-                        catch (Exception ex)
-                        {
-                            // TODO: Publish StockRejectedEvent (Insufficient Stock)
-                            _logger.LogError("Insufficient stock for Order {OrderId}: {Message}", context.Message.OrderId, ex.Message);
-                            //** sth like await context.Publish(new StockRejectedEvent(context.Message.OrderId, "Insufficient stock"));
-                            return;
-                        }
+                        _logger.LogWarning("Order {OrderId} Rejected: Insufficient stock for {ProductId}.", context.Message.OrderId, item.ProductId);
+                        await RejectOrder(context, $"Insufficient stock for {item.ProductId}");
+                        return;
                     }
                 }
 
-                // use ef tracker to save all modified inventory items in one transaction
-                await _repository.UnitOfWork.SaveEntitiesAsync();
+                foreach (var item in context.Message.Items)
+                {
+                    var inventoryItem = await _repository.GetByProductIdAsync(item.ProductId);
+                    inventoryItem!.RemoveStock(item.Units);
+                }
 
-                _logger.LogInformation("Stock reserved for Order {OrderId}", context.Message.OrderId);
+                await context.Publish(new StockConfirmedIntegrationEvent(context.Message.OrderId));
 
-                // TODO: Publish StockConfirmedIntegrationEvent (so Ordering service can change status to 'StockConfirmed')
-                // sth like await context.Publish(new StockConfirmedIntegrationEvent(context.Message.OrderId));
+                _logger.LogInformation("Stock successfully reserved for Order {OrderId}", context.Message.OrderId);
+
+                await _repository.UnitOfWork.SaveEntitiesAsync(context.CancellationToken);
+            }
+            catch (CustomConcurrencyException ex)
+            {
+                //concurrency can event happens for stock = 50. So, we reporocess on the next try.
+                _logger.LogWarning(ex, "Concurrency conflict detected for Order {OrderId}. MassTransit will retry the message to re-evaluate stock.", context.Message.OrderId);
+                throw;
             }
             catch (Exception ex)
             {
-                //system crash. re-throw so MassTransit knows to Retry 
-                _logger.LogError(ex, "System failure while saving inventory for Order {OrderId}", context.Message.OrderId);
+                //system failures
+                _logger.LogError(ex, "System failure processing Order {OrderId}", context.Message.OrderId);
                 throw;
             }
+        }
+
+        // Helper to publish rejection and save the outbox message
+        private async Task RejectOrder(ConsumeContext<OrderCreatedIntegrationEvent> context, string reason)
+        {
+            await context.Publish(new StockRejectedIntegrationEvent(context.Message.OrderId, reason));
+
+            // Save messages in Outbox (part of the same transaction)
+            await _repository.UnitOfWork.SaveEntitiesAsync(context.CancellationToken);
         }
     }
 }
