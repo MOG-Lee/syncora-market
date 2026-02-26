@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Syncora.SharedKernel.IntegrationEvents
 {
-    public record OrderCancelledIntegrationEvent(Guid OrderId, List<OrderCancelledItemDto> items);
+    public record OrderCancelledIntegrationEvent(Guid OrderId, List<OrderCancelledItemDto> Items);
 
     public record OrderCancelledItemDto(Guid ProductId, int Units);
 }

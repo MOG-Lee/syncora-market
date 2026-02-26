@@ -48,7 +48,13 @@ try
         {
             o.QueryDelay = TimeSpan.FromSeconds(10);
             o.UseSqlServer();
-            o.UseBusOutbox();
+            o.UseBusOutbox(); //This only covers IPublishEndpoint (outside consumers)
+        });
+
+        // This tells MassTransit to enable the Outbox on all Receive Endpoints (Consumers)
+        x.AddConfigureEndpointsCallback((context, name, cfg) =>
+        {
+            cfg.UseEntityFrameworkOutbox<InventoryDbContext>(context);
         });
 
         x.UsingRabbitMq((context, cfg) =>
@@ -80,6 +86,8 @@ try
     builder.Services.AddProblemDetails();
 
     var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

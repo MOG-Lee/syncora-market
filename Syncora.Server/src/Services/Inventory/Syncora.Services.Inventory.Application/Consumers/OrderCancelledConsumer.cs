@@ -27,7 +27,7 @@ namespace Syncora.Services.Inventory.Application.Consumers
 
             try
             {
-                foreach (var item in context.Message.items)
+                foreach (var item in context.Message.Items)
                 {
                     var inventoryItem = await _repository.GetByProductIdAsync(item.ProductId);
 

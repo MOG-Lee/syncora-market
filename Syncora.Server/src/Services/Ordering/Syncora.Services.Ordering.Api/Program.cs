@@ -57,7 +57,13 @@ try
         {
             o.QueryDelay = TimeSpan.FromSeconds(10); // How often to check for new messages
             o.UseSqlServer();
-            o.UseBusOutbox(); // make IBus/IPublishEndpoint write to DB, not RabbitMQ
+            o.UseBusOutbox(); // make IPublishEndpoint write to DB, not RabbitMQ. This only covers IPublishEndpoint (outside consumers)
+        });
+
+        // This tells MassTransit to enable the Outbox on all Receive Endpoints (Consumers)
+        x.AddConfigureEndpointsCallback((context, name, cfg) =>
+        {
+            cfg.UseEntityFrameworkOutbox<OrderingDbContext>(context);
         });
 
         //Setup RabbitMQ
@@ -94,6 +100,9 @@ try
 
     //freezes the configuration, we can not add any more services
     var app = builder.Build();
+
+    //log request to the controllers
+    app.UseSerilogRequestLogging();
 
     // if ASPNETCORE_ENVIRONMENT variable is set to "Development"
     if (app.Environment.IsDevelopment())

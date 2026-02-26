@@ -19,8 +19,9 @@ namespace Syncora.Services.Ordering.Application.Orders.Commands.CreateOrder
 
         public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            // if we need more entities like user, we create IBuyerService here and get that data => buyerDetails = await _buyerService.GetBuyerTaxDetailsAsync (http or repository)
-            // then we do not pass whole user entity to the order for logics, we only send properties which needed like buyerDetails.IsTaxExempt
+            // if we need more data like checking real price of products, we can 1) http get to catalog (ICatalogIntegrationService) 2) duplicated data and use IOrderingProductRepository
+            // if product prices are not the same, we can throw DomainException 
+            // we do not pass whole user entity to the order for logics, we only send properties which needed like buyerDetails.IsTaxExempt
 
             var shippingAddress = new Address(request.ShippingAddress.Street, request.ShippingAddress.City, request.ShippingAddress.ZipCode);
 

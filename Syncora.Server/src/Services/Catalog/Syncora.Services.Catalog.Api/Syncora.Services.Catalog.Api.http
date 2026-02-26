@@ -1,0 +1,6 @@
+@Syncora.Services.Catalog.Api_HostAddress = http://localhost:5293
+
+GET {{Syncora.Services.Catalog.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
