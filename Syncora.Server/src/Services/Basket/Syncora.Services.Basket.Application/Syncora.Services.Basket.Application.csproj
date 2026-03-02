@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Syncora.SharedKernel\Syncora.SharedKernel.csproj" />
+    <ProjectReference Include="..\Syncora.Services.Basket.Domain\Syncora.Services.Basket.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

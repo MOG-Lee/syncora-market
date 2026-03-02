@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # 1. The Lightweight Redis Database
+  syncora-redis:
+    image: redis:alpine
+    container_name: syncora-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  # 2. The Visual Database Manager
+  syncora-redis-insight:
+    image: redis/redisinsight:latest
+    container_name: syncora-redis-insight
+    ports:
+      - "8001:5540"
+    restart: always
