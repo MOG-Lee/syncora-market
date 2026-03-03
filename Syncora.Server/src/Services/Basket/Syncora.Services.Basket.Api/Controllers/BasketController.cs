@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Syncora.Services.Basket.Application.Interfaces;
 using Syncora.Services.Basket.Domain.Entities;
+using System.Security.Claims;
 
 namespace Syncora.Services.Basket.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BasketController : ControllerBase
@@ -17,11 +20,13 @@ namespace Syncora.Services.Basket.Api.Controllers
             _logger = logger;
         }
 
-        // GET api/basket/{buyerId}
-        [HttpGet("{buyerId:guid}")]
+        // GET api/basket
+        [HttpGet]
         [ProducesResponseType(typeof(CustomerBasket), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CustomerBasket>> GetBasketById(Guid buyerId)
+        public async Task<ActionResult<CustomerBasket>> GetBasket()
         {
+            var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var basket = await _repository.GetBasketAsync(buyerId);
 
             return Ok(basket ?? new CustomerBasket(buyerId));
@@ -31,14 +36,18 @@ namespace Syncora.Services.Basket.Api.Controllers
         [ProducesResponseType(typeof(CustomerBasket), StatusCodes.Status200OK)]
         public async Task<ActionResult<CustomerBasket>> UpdateBasket([FromBody] CustomerBasket basket)
         {
+            basket.BuyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var updatedBasket = await _repository.UpdateBasketAsync(basket);
             return Ok(updatedBasket);
         }
 
-        [HttpDelete("{buyerId:guid}")]
+        [HttpDelete]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> DeleteBasketById(Guid buyerId)
+        public async Task<ActionResult<bool>> DeleteBasketById()
         {
+            var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var result = await _repository.DeleteBasketAsync(buyerId);
             return Ok(result);
         }

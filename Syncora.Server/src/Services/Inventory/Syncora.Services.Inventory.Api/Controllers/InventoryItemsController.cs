@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Syncora.Services.Inventory.Application.InventoryItems.Commands.CreateInventoryItem;
@@ -6,6 +7,7 @@ using Syncora.Services.Inventory.Application.InventoryItems.Queries.GetInventory
 
 namespace Syncora.Services.Inventory.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class InventoryItemsController : ControllerBase
@@ -17,6 +19,7 @@ namespace Syncora.Services.Inventory.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin, SuperAdmin")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateInventoryItem([FromBody] CreateInventoryItemCommand command)
         {

@@ -1,13 +1,16 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Syncora.Services.Ordering.Application.Orders.Commands.CancelOrder;
 using Syncora.Services.Ordering.Application.Orders.Commands.CreateOrder;
 using Syncora.Services.Ordering.Application.Orders.Queries.GetOrderDetails;
 using Syncora.Services.Ordering.Application.Orders.Queries.GetOrderSummary;
+using System.Security.Claims;
 
 namespace Syncora.Services.Ordering.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
@@ -23,11 +26,13 @@ namespace Syncora.Services.Ordering.Api.Controllers
         //[ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PlaceOrder([FromBody] CreateOrderCommand command)
+        public async Task<IActionResult> PlaceOrder([FromBody] CreateOrderRequest request)
         {
+            var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var command = new CreateOrderCommand(buyerId, request.ShippingAddress, request.OrderItems);
+
             var orderId = await _mediator.Send(command);
 
-            // return CreatedAtAction(nameof(GetOrder), new { id = orderId }, orderId);
             return Ok(orderId);
         }
 
@@ -43,11 +48,13 @@ namespace Syncora.Services.Ordering.Api.Controllers
             return Ok(order);
         }
 
-        // GET api/orders/customer/{buyerId}
-        [HttpGet("customer/{buyerId}")]
+        // GET api/orders/customer/
+        [HttpGet("customer")]
         [ProducesResponseType(typeof(IEnumerable<OrderSummaryDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetOrdersByCustomer(Guid buyerId)
+        public async Task<IActionResult> GetOrdersByCustomer()
         {
+            var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var query = new GetOrderSummaryQuery(buyerId);
             var orders = await _mediator.Send(query);
             return Ok(orders);
@@ -65,4 +72,6 @@ namespace Syncora.Services.Ordering.Api.Controllers
             return NoContent();
         }
     }
+
+    public record CreateOrderRequest(CreateOrderAddressDto ShippingAddress, List<CreateOrderOrderItemDto> OrderItems);
 }

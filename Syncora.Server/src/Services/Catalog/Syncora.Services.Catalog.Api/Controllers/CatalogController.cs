@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Syncora.Services.Catalog.Application.Interfaces;
 using Syncora.Services.Catalog.Domain.Entities;
 
 namespace Syncora.Services.Catalog.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CatalogController : ControllerBase
@@ -19,6 +21,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
         }
 
         //Catalog
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
@@ -27,6 +30,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
         }
 
         //Catalog/{id}
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Product>> GetProductById(Guid id)
@@ -41,6 +45,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
         }
 
         //Catalog/GetProductByCategory/{category}
+        [AllowAnonymous]
         [HttpGet("[action]/{category}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductByCategory(string category)
         {
@@ -48,6 +53,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
             return Ok(products);
         }
 
+        [Authorize(Roles = "Admin, SuperAdmin")]
         [HttpPost]
         [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
         public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
@@ -58,6 +64,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
             return StatusCode(StatusCodes.Status201Created, product);
         }
 
+        [Authorize(Roles = "Admin, SuperAdmin")]
         [HttpPut]
         public async Task<ActionResult> UpdateProduct([FromBody] Product product)
         {
@@ -69,6 +76,7 @@ namespace Syncora.Services.Catalog.Api.Controllers
             return Ok(isSuccess);
         }
 
+        [Authorize(Roles = "Admin, SuperAdmin")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteProductById(Guid id)
         {

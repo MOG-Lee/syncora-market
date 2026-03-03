@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syncora.Services.Basket.Inf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syncora.Services.Basket.Api", "src\Services\Basket\Syncora.Services.Basket.Api\Syncora.Services.Basket.Api.csproj", "{F7D327C4-7633-4DA8-A4E2-8C69A7D8187A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syncora.Services.Identity.Api", "src\Services\Identity\Syncora.Services.Identity.Api\Syncora.Services.Identity.Api.csproj", "{1D2A3300-3B07-424F-82CE-8351D9EC763F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,10 @@ Global
 		{F7D327C4-7633-4DA8-A4E2-8C69A7D8187A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7D327C4-7633-4DA8-A4E2-8C69A7D8187A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7D327C4-7633-4DA8-A4E2-8C69A7D8187A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D2A3300-3B07-424F-82CE-8351D9EC763F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D2A3300-3B07-424F-82CE-8351D9EC763F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D2A3300-3B07-424F-82CE-8351D9EC763F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D2A3300-3B07-424F-82CE-8351D9EC763F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -192,6 +198,7 @@ Global
 		{185C8822-3570-47A1-BED8-6A5E237C18DE} = {69A0574D-69F0-4A0A-A168-63D33D33CFD3}
 		{0DC52670-2142-4565-AD73-8A0BE35D935B} = {69A0574D-69F0-4A0A-A168-63D33D33CFD3}
 		{F7D327C4-7633-4DA8-A4E2-8C69A7D8187A} = {69A0574D-69F0-4A0A-A168-63D33D33CFD3}
+		{1D2A3300-3B07-424F-82CE-8351D9EC763F} = {02A20341-B582-474A-B9A5-147D96483515}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4D496D4-DEBB-4A1A-B2B4-AAA49ACB3AC3}

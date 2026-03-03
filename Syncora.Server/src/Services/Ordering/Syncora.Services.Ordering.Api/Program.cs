@@ -1,5 +1,8 @@
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Syncora.Services.Ordering.Api.Extensions;
 using Syncora.Services.Ordering.Api.Infrastructure;
@@ -9,6 +12,7 @@ using Syncora.Services.Ordering.Domain.AggregatesModel.OrderAggregate;
 using Syncora.Services.Ordering.Infrastructure.Persistence;
 using Syncora.Services.Ordering.Infrastructure.Repositories;
 using Syncora.Services.Ordering.Infrastructure.Services;
+using System.Text;
 
 
 //Setup Serilog before the builder
@@ -91,7 +95,52 @@ try
     // enables the parsing of the controllers like [ApiController]
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+
+    //configure JWT authentication
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey)
+        };
+    });
+
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+    });
+
 
     //register the global exception handler
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -119,7 +168,8 @@ try
     //Security best practice. to change to HTTPS in production, and redirect HTTP to HTTPS
     app.UseHttpsRedirection();
 
-    //checking what you can do  *** app.UseAuthentication() (checking who you are)
+    //checking what you can do  
+    app.UseAuthentication();
     app.UseAuthorization();
 
     // Map the controllers to endpoints, request /api/orders, go to OrdersController
