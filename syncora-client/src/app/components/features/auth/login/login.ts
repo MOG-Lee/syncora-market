@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { LoginRequest } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 export class Login {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   isLoading = signal(false);
   errorMessage = signal('');
@@ -28,27 +31,26 @@ export class Login {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    // SIMULATION: Simulate API call
-    setTimeout(() => {
+    const credentials: LoginRequest = {
+      email: this.loginForm.value.email!,
+      password: this.loginForm.value.password!
+    };
 
-      // Object Destructuring
-      const { email, password } = this.loginForm.value;
-      // if we do not use object destructuring, we need sth like this
-      //const email = this.loginForm.value.email;        
-      //const password = this.loginForm.value.password;  
-
-      // Mock Success Logic
-      if (email === 'vendor@test.com') {
-        // In real app: AuthService.login(token)
-        this.router.navigate(['/vendor/dashboard']);
-      } else {
-        this.router.navigate(['/']); // Go to Home
+    this.authService.login(credentials).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+        // Successful login, redirect to home page
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        if (err.status === 401) {
+          this.errorMessage.set('Invalid email or password.');
+        } else {
+          this.errorMessage.set('An error occurred while communicating with the server.');
+        }
       }
-
-      this.isLoading.set(false);
-    }, 1500);
+    });
   }
-
-
-
 }
+

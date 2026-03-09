@@ -147,6 +147,16 @@ try
     // adds support for returning ProblemDetails in case of exceptions
     builder.Services.AddProblemDetails();
 
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAngularClient", policy =>
+        {
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    });
+
     //freezes the configuration, we can not add any more services
     var app = builder.Build();
 
@@ -167,6 +177,8 @@ try
 
     //Security best practice. to change to HTTPS in production, and redirect HTTP to HTTPS
     app.UseHttpsRedirection();
+
+    app.UseCors("AllowAngularClient");
 
     //checking what you can do  
     app.UseAuthentication();

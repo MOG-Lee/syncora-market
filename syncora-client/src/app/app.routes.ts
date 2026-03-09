@@ -3,6 +3,7 @@ import { MainLayout } from './components/layout/main-layout/main-layout';
 import { VendorLayout } from './components/layout/vendor-layout/vendor-layout';
 import { Dashboard } from './components/features/vendor/dashboard/dashboard';
 import { Home } from './components/features/shop/home/home';
+import { roleGuard } from './core/guards/role.guard';
 
 
 export const routes: Routes = [
@@ -37,7 +38,8 @@ export const routes: Routes = [
     {
         path: 'vendor',
         component: VendorLayout,
-        // (Optional) add canActivate: [AuthGuard] here later to protect it
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'SuperAdmin'] },
         children: [
             { path: 'dashboard', component: Dashboard }, // http://site.com/vendor/dashboard
 

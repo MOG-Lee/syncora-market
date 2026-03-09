@@ -10,8 +10,7 @@ namespace Syncora.Services.Identity.Api.Models
         [Required][EmailAddress] string Email,
         [Required] string Password,
         [Required] string FirstName,
-        [Required] string LastName,
-        string Role = "User");
+        [Required] string LastName);
 
     public record AuthResponse(
         string Email,

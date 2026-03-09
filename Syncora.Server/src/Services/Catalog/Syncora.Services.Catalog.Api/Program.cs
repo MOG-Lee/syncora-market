@@ -73,6 +73,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // adds support for returning ProblemDetails in case of exceptions
 builder.Services.AddProblemDetails();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 app.Services.GetRequiredService<ICatalogContext>();
@@ -88,6 +98,8 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularClient");
 
 //TODO**** for serving static files like images, css, js etc. from wwwroot folder ****
 //app.UseStaticFiles();

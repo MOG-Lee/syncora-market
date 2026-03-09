@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { RegisterRequest } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-register',
@@ -11,8 +13,10 @@ import { Router, RouterLink } from '@angular/router';
 export class Register {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   isLoading = signal(false);
+  errorMessage = signal('');
 
   // Custom Validator Logic
   passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -30,13 +34,35 @@ export class Register {
   }, { validators: this.passwordMatchValidator });
 
   onSubmit() {
-    if (this.registerForm.invalid) return;
+    if (this.registerForm.invalid)
+      return;
     this.isLoading.set(true);
+    this.errorMessage.set('');
 
-    // Simulate API
-    setTimeout(() => {
-      this.router.navigate(['/login']); // Redirect to login after success
-      this.isLoading.set(false);
-    }, 1500);
+    const fullName = this.registerForm.value.name!.trim().split(' ');
+    const firstName = fullName[0];
+    const lastName = fullName.length > 1 ? fullName.slice(1).join(' ') : 'User'; // Fallback if they only type one name
+
+    const request: RegisterRequest = {
+      firstName: firstName,
+      lastName: lastName,
+      email: this.registerForm.value.email!,
+      password: this.registerForm.value.password!
+    };
+
+    this.authService.register(request).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        if (err.status === 400 && typeof err.error === 'string') {
+          this.errorMessage.set(err.error);
+        } else {
+          this.errorMessage.set('An error occurred during registration. Please try again.');
+        }
+      }
+    });
   }
 }

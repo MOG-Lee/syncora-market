@@ -32,6 +32,7 @@ namespace Syncora.Services.Identity.Api.Controllers
             if (userExists != null)
                 return BadRequest("User already exists!");
 
+            string role = "User";
             ApplicationUser user = new()
             {
                 Email = request.Email,
@@ -46,12 +47,12 @@ namespace Syncora.Services.Identity.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "User creation failed! Please check user details and try again.");
 
             // Automatically create the role if it doesn't exist in the DB yet
-            if (!await _roleManager.RoleExistsAsync(request.Role))
-                await _roleManager.CreateAsync(new IdentityRole(request.Role));
+            if (!await _roleManager.RoleExistsAsync(role))
+                await _roleManager.CreateAsync(new IdentityRole(role));
 
-            await _userManager.AddToRoleAsync(user, request.Role);
+            await _userManager.AddToRoleAsync(user, role);
 
-            return Ok("User created successfully!");
+            return Ok(new { Message = "User created successfully!" });
         }
 
         [HttpPost("login")]
