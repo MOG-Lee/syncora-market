@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   enableDebug: true,
-  imageBaseUrl: '/images',
+  imageBaseUrl: 'https://localhost:7022/images',
 
   // Microservice Base URLs
   identityApiUrl: 'https://localhost:7057/api',

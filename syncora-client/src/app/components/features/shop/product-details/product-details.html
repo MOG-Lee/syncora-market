@@ -19,19 +19,19 @@
 
         <div class="col-md-6">
             <div class="p-2 border rounded bg-white text-center position-relative overflow-hidden">
-                <img [src]="item.imageUrl | productImg:'l'" [alt]="item.name"
+                <img [src]="item.imageFileName | productImg:'l'" [alt]="item.name"
                     class="img-fluid main-image object-fit-contain">
-                @if(item.isOnFlashSale){
-                <span class="position-absolute top-0 start-0 m-3 badge bg-danger fs-6 px-3 py-2 shadow-sm">
+                @if(item.price <= 500){ <span
+                    class="position-absolute top-0 start-0 m-3 badge bg-danger fs-6 px-3 py-2 shadow-sm">
                     <i class="bi bi-lightning-fill"></i> Flash Deal
-                </span>
-                }
+                    </span>
+                    }
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="mb-2 text-primary fw-bold small text-uppercase tracking-wide">
-                sold by {{item.vendorName}}
+                sold by Syncora
             </div>
 
             <h1 class="fw-bold mb-2">{{item.name}}</h1>
@@ -44,17 +44,16 @@
                     <i class="bi bi-star-fill"></i>
                     <i class="bi bi-star-half"></i>
                 </div>
-                <span class="text-muted small">({{ item.averageRating }} ratings)</span>
+                <span class="text-muted small">({{ 4 }} ratings)</span>
             </div>
 
             <div class="mb-4 p-3 bg-light rounded border">
                 <div class="d-flex align-items-end gap-2">
                     <span class="display-5 fw-bold text-dark">{{ item.price | currency }}</span>
-                    @if (item.isOnFlashSale) {
-                    <span class="text-muted text-decoration-line-through fs-5 mb-2">
+                    @if (item.price <= 500) { <span class="text-muted text-decoration-line-through fs-5 mb-2">
                         {{ item.price * 1.2 | currency}}
-                    </span>
-                    }
+                        </span>
+                        }
                 </div>
                 <p class="text-success small mb-0 mt-1">
                     <i class="bi bi-check-circle-fill me-1"></i> Includes VAT & Free Shipping
@@ -65,9 +64,9 @@
                 {{ item.description }}
             </p>
 
-            @if (item.stockQuantity > 0) {
+            @if (item.price > 2000) {
             <div class="text-success fw-bold mb-4">
-                <i class="bi bi-box-seam me-1"></i> In Stock ({{ item.stockQuantity }} available)
+                <i class="bi bi-box-seam me-1"></i> In Stock (5 available)
             </div>
             } @else {
             <div class="text-danger fw-bold mb-4">
@@ -76,8 +75,7 @@
             }
 
             <div class="d-flex gap-3">
-                <button class="btn btn-primary btn-lg flex-grow-1 shadow-sm" (click)="addToCart()"
-                    [disabled]="item.stockQuantity === 0"> Add to Cart
+                <button class="btn btn-primary btn-lg flex-grow-1 shadow-sm" (click)="addToCart()"> Add to Cart
                 </button>
                 <button class="btn btn-outline-secondary btn-lg">
                     <i class="bi bi-heart"></i>

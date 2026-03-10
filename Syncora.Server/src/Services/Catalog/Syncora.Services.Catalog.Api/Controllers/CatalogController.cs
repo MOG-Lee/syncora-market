@@ -87,5 +87,22 @@ namespace Syncora.Services.Catalog.Api.Controllers
 
             return Ok(isSuccess);
         }
+
+
+        [AllowAnonymous]
+        [HttpGet("categories")]
+        public ActionResult<IEnumerable<Category>> GetCategories()
+        {
+            // In the future, this can be extracted from mongo db.
+            var categories = new List<Category>
+            {
+                new Category { Name = "Electronics", ImageFileName = "a1b2-c3d4.jpg" },
+                new Category { Name = "Home & Kitchen", ImageFileName = "b.jpg" },
+                new Category { Name = "Gaming Accessories", ImageFileName = "c.jpg" },
+                new Category { Name = "Books", ImageFileName = "a1b2-c3d4.jpg" }
+            };
+
+            return Ok(categories);
+        }
     }
 }

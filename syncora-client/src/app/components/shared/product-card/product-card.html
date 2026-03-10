@@ -1,10 +1,10 @@
 <div class="card h-100 border-0 shadow-sm product-card">
     <a [routerLink]="['/product', product.id]" class="text-decoration-none">
         <div class="position-relative p-3 text-center bg-white image-container">
-            <img [src]="product.imageUrl | productImg:'m'" [alt]="product.name"
+            <img [src]="product.imageFileName | productImg:'m'" [alt]="product.name"
                 class="img-fluid object-fit-contain h-100 w-100">
 
-            @if (product.isOnFlashSale ?? false) {
+            @if (product.price <= 500) {
             <span class="position-absolute top-0 start-0 badge bg-danger m-2 shadow-sm">
                 Flash Deal
             </span>
@@ -13,7 +13,7 @@
     </a>
 
     <div class="card-body d-flex flex-column p-3">
-        <small class="text-muted mb-1 vendor-text">{{ product.vendorName }}</small>
+        <small class="text-muted mb-1 vendor-text">Syncora</small>
         <a [routerLink]="['/product', product.id]" class="text-decoration-none text-dark">
             <h5 class="card-title text-truncate-2 mb-2" [title]="product.name">
                 {{ product.name }}
@@ -26,7 +26,7 @@
             <i class="bi bi-star-fill"></i>
             <i class="bi bi-star-fill"></i>
             <i class="bi bi-star-half"></i>
-            <span class="text-muted ms-1 text-black-50">({{ product.averageRating }})</span>
+            <span class="text-muted ms-1 text-black-50">({{ 4 }})</span>
         </div>
 
         <div class="mt-auto d-flex align-items-end justify-content-between">
@@ -34,7 +34,7 @@
             <div class="d-flex flex-column">
                 <span class="fs-5 fw-bold text-dark">{{ product.price | currency }}</span>
 
-                @if(product.isOnFlashSale ?? false) {
+                @if(product.price <= 500) {
                 <small class="text-decoration-line-through text-muted original-price">
                     {{ product.price * 1.2 | currency }}
                 </small>

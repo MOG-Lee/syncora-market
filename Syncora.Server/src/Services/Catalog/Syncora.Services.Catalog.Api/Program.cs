@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Syncora.Services.Catalog.Api.Infrastructure;
@@ -101,8 +102,17 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularClient");
 
-//TODO**** for serving static files like images, css, js etc. from wwwroot folder ****
-//app.UseStaticFiles();
+var imagesPath = @"C:\Users\mogpr\Desktop\Project assets\Images";
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/images"
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

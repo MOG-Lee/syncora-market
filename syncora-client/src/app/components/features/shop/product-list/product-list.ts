@@ -4,6 +4,7 @@ import { Product } from '../../../../core/models/product.model';
 import { ProductCard } from "../../../shared/product-card/product-card";
 import { flatMap } from 'rxjs';
 import { NgTemplateOutlet } from '@angular/common';
+import { CatalogService } from '../../../../core/services/catalog/catalog-service';
 
 
 @Component({
@@ -14,10 +15,11 @@ import { NgTemplateOutlet } from '@angular/common';
 })
 export class ProductList {
   private route = inject(ActivatedRoute);
+  private catalogService = inject(CatalogService);
 
   searchQuery = signal('');
   products = signal<Product[]>([]);
-  isLoading = signal(false);
+  isLoading = signal(true);
   sortOption = signal('featured');
   showMobileFilters = signal(false);
 
@@ -27,72 +29,15 @@ export class ProductList {
       const category = params['category'];
 
       this.searchQuery.set(query || category || 'All Products');
-      this.loadProducts(query, category);
+     
     });
   }
 
-  loadProducts(query: string, category: string) {
-    this.isLoading.set(true);
-
-    setTimeout(() => {
-      const mockData: Product[] = [
-        {
-          id: 'p1',
-          name: 'Sony WH-1000XM5 Wireless Noise Canceling Headphones',
-          price: 348.00,
-          description: 'Industry leading noise cancellation.',
-          imageUrl: 'a1b2-c3d4.jpg',
-          stockQuantity: 15,
-          vendorId: 'v1',
-          vendorName: 'Sony Official',
-          category: 'Audio',
-          averageRating: 4.8,
-          isOnFlashSale: true
-        },
-        {
-          id: 'p2',
-          name: 'MacBook Air M2 Chip',
-          price: 999.00,
-          description: 'Industry leading noise cancellation.',
-          imageUrl: 'a1b2-c3d4.jpg',
-          stockQuantity: 15,
-          vendorId: 'v1',
-          vendorName: 'Sony Official',
-          category: 'Audio',
-          averageRating: 5.0,
-          isOnFlashSale: false
-        },
-        {
-          id: 'p3',
-          name: 'Xiaomi Series 5 Fully Noise Canceling Headphones',
-          price: 50.00,
-          description: 'Industry leading noise cancellation.',
-          imageUrl: 'a1b2-c3d4.jpg',
-          stockQuantity: 15,
-          vendorId: 'v1',
-          vendorName: 'Sony Official',
-          category: 'Audio',
-          averageRating: 4.8,
-          isOnFlashSale: true
-        },
-        {
-          id: 'p4',
-          name: 'HP OMEN',
-          price: 1299.00,
-          description: 'Industry leading noise cancellation.',
-          imageUrl: 'a1b2-c3d4.jpg',
-          stockQuantity: 15,
-          vendorId: 'v1',
-          vendorName: 'Sony Official',
-          category: 'Audio',
-          averageRating: 5.0,
-          isOnFlashSale: false
-        },
-      ];
-
-      this.products.set(mockData);
+  ngOnInit() {
+    this.catalogService.getProducts().subscribe(data => {
+      this.products.set(data);
       this.isLoading.set(false);
-    }, 800);
+    });
   }
 
   onSortChange(event: Event) {
@@ -102,7 +47,6 @@ export class ProductList {
   }
 
   onPriceChange(event: Event) {
-
   }
 
   toggleMobileFilters() {

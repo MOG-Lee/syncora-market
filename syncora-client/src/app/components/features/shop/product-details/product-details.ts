@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Product } from '../../../../core/models/product.model';
 import { ProductImgPipe } from '../../../../core/pipes/product-img-pipe';
 import { CurrencyPipe } from '@angular/common';
+import { CatalogService } from '../../../../core/services/catalog/catalog-service';
 
 @Component({
   selector: 'app-product-details',
@@ -14,15 +15,18 @@ import { CurrencyPipe } from '@angular/common';
 export class ProductDetails {
   private route = inject(ActivatedRoute);
   private cartService = inject(CartService);
+  private catalogService = inject(CatalogService);
 
   isLoading = signal(true);
   product = signal<Product | null>(null);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-
     if (id) {
-      this.loadProduct(id);
+      this.catalogService.getProductById(id).subscribe(data => {
+        this.product.set(data);
+        this.isLoading.set(false);
+      });
     }
   }
 
@@ -31,24 +35,5 @@ export class ProductDetails {
     if (currentProduct) {
       this.cartService.addToCart(currentProduct);
     }
-  }
-
-  private loadProduct(id: string) {
-    setTimeout(() => {
-      this.product.set({
-        id: id,
-        name: 'Sony WH-1000XM5 Wireless Noise Canceling Headphones',
-        price: 348.00,
-        description: 'The WH-1000XM5 headphones rewrite the rules for distraction-free listening. Two processors control 8 microphones for unprecedented noise cancellation and exceptional call quality.',
-        imageUrl: 'a1b2-c3d4.jpg',
-        stockQuantity: 15,
-        vendorId: 'v1',
-        vendorName: 'Sony Official',
-        category: 'Audio',
-        averageRating: 4.8,
-        isOnFlashSale: true
-      });
-      this.isLoading.set(false);
-    }, 1000);
   }
 }
