@@ -3,6 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService } from '../../../../core/services/cart/cart-service';
 import { CurrencyPipe } from '@angular/common';
+import { OrderService } from '../../../../core/services/order/order.service';
+import { OrderRequest } from '../../../../core/models/order.model';
 
 @Component({
   selector: 'app-checkout',
@@ -14,11 +16,14 @@ export class Checkout {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private cartService = inject(CartService);
+  private orderService = inject(OrderService);
 
   cartCount = this.cartService.cartCount;
   subTotal = this.cartService.subTotal;
 
   isProcessing = signal(false);
+  errorMessage = signal('');
+
   checkoutForm = this.fb.group({
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
@@ -36,15 +41,41 @@ export class Checkout {
     }
 
     this.isProcessing.set(true);
+    this.errorMessage.set('');
 
-    setTimeout(() => {
-      const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
+    const formValues = this.checkoutForm.value;
 
-      // Senior Step: Clear the cart locally after success
-      this.cartService.clearCart();
+    const orderItems = this.cartService.cartItems().map(item => ({
+      productId: item.productId,
+      productName: item.productName,
+      unitPrice: item.unitPrice,
+      pictureUrl: '',
+      units: item.quantity
+    }));
 
-      this.isProcessing.set(false);
-      this.router.navigate(['/order-confirmation', orderId]);
-    }, 2000);
+    const request: OrderRequest = {
+      shippingAddress: {
+        street: formValues.address!,  
+        city: formValues.city!,
+        zipCode: formValues.zip!
+      },
+      orderItems: orderItems
+    };
+
+    this.orderService.placeOrder(request).subscribe({
+      next: (response) => {
+        this.isProcessing.set(false);
+        this.cartService.clearCart();
+
+        // Remove quotes if the API returned '"xxxx-xxxx-..."'
+        const cleanOrderId = response.replace(/['"]+/g, '');
+        this.router.navigate(['/order-confirmation', cleanOrderId]);
+      },
+      error: (err) => {
+        this.isProcessing.set(false);
+        this.errorMessage.set(err);
+        console.error('Order failed', err);
+      }
+    });
   }
 }

@@ -22,29 +22,29 @@
         </div>
         } @else {
         <div class="flex-grow-1 overflow-auto p-3">
-            @for (item of items(); track item.product.id) {
+            @for (item of items(); track item.productId) {
             <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
 
                 <div class="flex-shrink-0 border rounded p-1">
-                    <img [src]="item.product.imageFileName | productImg:'s'" class="object-fit-contain" width="60"
-                        height="60" [alt]="item.product.name">
+                    <img [src]="item.pictureUrl | productImg:'s'" class="object-fit-contain" width="60" height="60"
+                        [alt]="item.productName">
                 </div>
 
                 <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0 text-truncate" style="max-width: 180px;">{{ item.product.name }}</h6>
-                    <small class="text-muted">{{ item.product.price | currency }}</small>
+                    <h6 class="mb-0 text-truncate" style="max-width: 180px;">{{ item.productName }}</h6>
+                    <small class="text-muted">{{ item.unitPrice | currency }}</small>
 
                     <div class="d-flex align-items-center mt-2">
                         <div class="input-group input-group-sm" style="width: 100px;">
                             <button class="btn btn-outline-secondary"
-                                (click)="decrease(item.product.id, item.quantity)">-</button>
+                                (click)="decrease(item.productId, item.quantity)">-</button>
                             <span class="form-control text-center bg-white border-secondary">{{ item.quantity }}</span>
                             <button class="btn btn-outline-secondary"
-                                (click)="increase(item.product.id, item.quantity)">+</button>
+                                (click)="increase(item.productId, item.quantity)">+</button>
                         </div>
 
                         <button class="btn btn-link btn-sm text-danger text-decoration-none ms-auto"
-                            (click)="remove(item.product.id)">
+                            (click)="remove(item.productId)">
                             Remove
                         </button>
                     </div>

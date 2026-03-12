@@ -1,9 +1,43 @@
 <div class="min-vh-100 d-flex flex-column align-items-center justify-content-center text-center py-5">
-    <div class="mb-4 text-success">
-        <i class="bi bi-check-circle-fill display-1"></i>
+
+    @if(isLoading()) {
+    <div class="spinner-border text-primary mb-3" role="status"></div>
+    <h4 class="text-muted">Loading live order status...</h4>
+    } @else {
+
+    <div class="mb-4">
+        @switch(orderStatus()) {
+        @case(OrderStatus.Submitted) {
+        <i class="bi bi-file-earmark-check text-primary display-1"></i>
+        <h2 class="fw-bold mt-3 text-primary">Order Submitted</h2>
+        }
+        @case(OrderStatus.AwaitingValidation) {
+        <i class="bi bi-hourglass-split text-warning display-1"></i>
+        <h2 class="fw-bold mt-3 text-warning">Awaiting Validation</h2>
+        }
+        @case(OrderStatus.StockConfirmed) {
+        <i class="bi bi-box-seam text-info display-1"></i>
+        <h2 class="fw-bold mt-3 text-info">Stock Confirmed</h2>
+        }
+        @case(OrderStatus.Paid) {
+        <i class="bi bi-credit-card-fill text-success display-1"></i>
+        <h2 class="fw-bold mt-3 text-success">Payment Successful</h2>
+        }
+        @case(OrderStatus.Shipped) {
+        <i class="bi bi-truck text-success display-1"></i>
+        <h2 class="fw-bold mt-3 text-success">Order Shipped!</h2>
+        }
+        @case(OrderStatus.Cancelled) {
+        <i class="bi bi-x-circle-fill text-danger display-1"></i>
+        <h2 class="fw-bold mt-3 text-danger">Order Cancelled</h2>
+        }
+        @default {
+        <i class="bi bi-check-circle-fill text-success display-1"></i>
+        <h2 class="fw-bold mt-3">Order Received</h2>
+        }
+        }
     </div>
 
-    <h1 class="fw-bold mb-3">Order Placed Successfully!</h1>
     <p class="lead text-muted mb-4">Thank you for shopping with Syncora.</p>
 
     <div class="card border-0 shadow-sm p-4 mb-4 bg-light" style="max-width: 400px; width: 100%;">
@@ -11,10 +45,12 @@
         <h3 class="fw-bold text-dark m-0">{{ orderId() }}</h3>
     </div>
 
-    <p class="mb-4">We've sent a confirmation email to your inbox.</p>
+    <p class="mb-4">We've sent a confirmation email to your inbox. Bookmark this page or refresh it to see live updates!
+    </p>
 
     <div class="d-flex gap-3">
         <a routerLink="/" class="btn btn-primary px-4 fw-bold">Continue Shopping</a>
-        <a routerLink="/my-orders" class="btn btn-outline-secondary px-4">View Order</a>
+        <a routerLink="/my-orders" class="btn btn-outline-secondary px-4">View All Orders</a>
     </div>
+    }
 </div>
