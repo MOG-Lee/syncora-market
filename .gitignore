@@ -358,3 +358,7 @@ Thumbs.db
 
 # SECURITY: Never commit local development secrets
 appsettings.Development.json
+
+
+# Ignore GitHub configuration and AI rulebook folders
+.github/

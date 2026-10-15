@@ -31,8 +31,49 @@
                }
           </div>
 
-          <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-               <h3 class="fw-bold m-0">Today's Recommendations</h3>
+          <div class="d-flex flex-column justify-content-between align-items-center mb-3 px-2">
+               <h3 class="fw-bold mb-2">Today's Recommendations</h3>
+
+               @if (isMobile()) {
+               <!-- MOBILE: 3 Simple Stacked Cards -->
+               <div class="row g-2">
+                    <div class="col-12">
+                         <div class="card p-3 shadow-sm border-0 bg-white"><strong>Local:</strong> Free</div>
+                    </div>
+                    <div class="col-12">
+                         <div class="card p-3 shadow-sm border-0 bg-white"><strong>National:</strong> $5.99</div>
+                    </div>
+                    <div class="col-12">
+                         <div class="card p-3 shadow-sm border-0 bg-white"><strong>International:</strong> $15.99</div>
+                    </div>
+               </div>
+               } @else {
+               <!-- DESKTOP: Clean, Simple Table -->
+               <div class="table-responsive shadow-sm w-100">
+                    <table class="table table-bordered table-striped bg-white mb-0">
+                         <thead class="table-dark">
+                              <tr>
+                                   <th>Shipping Region</th>
+                                   <th>Standard Cost</th>
+                              </tr>
+                         </thead>
+                         <tbody>
+                              <tr>
+                                   <td>Local</td>
+                                   <td class="text-success fw-bold">Free</td>
+                              </tr>
+                              <tr>
+                                   <td>National</td>
+                                   <td>$5.99</td>
+                              </tr>
+                              <tr>
+                                   <td>International</td>
+                                   <td>$15.99</td>
+                              </tr>
+                         </tbody>
+                    </table>
+               </div>
+               }
           </div>
 
           <div class="row g-3 mb-4">
